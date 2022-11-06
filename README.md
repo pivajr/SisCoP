@@ -1,7 +1,7 @@
 # SisCop - Sistema de Controle de Presença
 
 
-[![Build Status](https://www.siscop.com.br/imagens/splash.png)](https://www.siscop.com.br/)
+[![Build Status](https://www.siscop.com.br/imagens/logo.png)](https://www.siscop.com.br/)
 
 
 # Sistema de Controle de Presença - SisCoP 
