@@ -6,17 +6,16 @@
 
 # SisCoP 
 
-  O Sistema de Controle de Presença (SisCoP) é um sistema para registro de presença que utiliza, além de usuário e senha, a face da pessoa que pretende registrar a presença como identificadores. Além disso a geolocalização também é registrada para identificação do local do registro. Para tanto, foram construidas quatro instâncias da aplicação, cada qual, realizando um controle ou tarefa específica:
-  - sicop-api 
-  - siscop-api-laravel
+  O Sistema de Controle de Presença (SisCoP) é um sistema para registro de presença que utiliza, além de usuário e senha, a face da pessoa que pretende registrar a presença como identificadores. Além disso a geolocalização também é registrada para identificação do local do registro de presença. Para tanto, foram construidas três instâncias da aplicação, cada qual, realizando um controle ou tarefa específica:
   - siscop-app
   - siscop-web
+  - siscop-api
   <br>
   Todos os arquivos estão divididos em diretórios específicos dentro do presente repositório.
 
 #  SisCoP-APP
 
-  Desenvolvido para as duas principais plataformas (Android e iOS). Trata-se do aplicativo móvel que permite o registro da presença em ambas as plataformas (celulares ou tablets) 
+  Desenvolvido para as duas principais plataformas (Android e iOS). Trata-se do aplicativo móvel (app) que permite o registro da presença em ambas as plataformas (celulares ou tablets).
 
   - Android e iOS
 ![app](https://www.siscop.com.br/imagens/app.png)
@@ -35,18 +34,13 @@
 
  Faz todo o gerenciamento e tratamento das operações e funcionalidades entre o APP e o Sistema Web. 
 
-#  SisCoP-API-LARAVEL
-
- No lado do servidor, as APIs são tratadas e gerenciadas por este módulo (dentro do framework Laravel)
-
   
-# Installation
+# Instalação
 
- Siga as orientações presentes no arquivo install.pdf localizado na raiz do presente repositório.
+ Siga as orientações presentes no arquivo INSTALL.PDF localizado na raiz do presente repositório.
 
-<br><br>
 
-### Software Registrado <br>
+# Software Registrado 
 Software devidamente registrado junto ao INPI sob número: BR 51 2022 002733-0.<br>
 
 <br><br>
