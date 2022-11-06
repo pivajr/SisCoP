@@ -7,10 +7,11 @@
 # Sistema de Controle de Presença - SisCoP 
 
   O Sistema de Controle de Presença (SisCoP) é um sistema para registro de presença que utiliza, além de usuário e senha, a face da pessoa que pretende registrar a presença como identificadores. Além disso a geolocalização também é registrada para identificação do local do registro. Para tanto, foram construidas quatro instâncias da aplicação, cada qual, realizando um controle ou tarefa específica:
-  - sicop-api - 
+  - sicop-api 
   - siscop-api-laravel
   - siscop-app
   - siscop-web
+  <br>
   Todos os arquivos estão divididos em diretórios específicos dentro do presente repositório.
 
 #  SisCoP-APP
