@@ -61,46 +61,59 @@ class _LoginPasswordPageState extends State<LoginPasswordPage> {
               const SizedBox(
                 height: 5,
               ),
-              ButtonOutline(
-                  icon: FontAwesomeIcons.chevronRight,
-                  iconRight: true,
-                  text: 'Continuar',
-                  onPressed: () async {
-                    showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (_) {
-                          return LoadingDialog(text: 'Procurando o usuário com o email ${ widget.email.value.text }',);
-                        }
-                    );
-
-                    User? user = await service.login(widget.email.value.text, password.value.text);
-
-                    if (!mounted) return;
-
-                    Navigator.of(context).pop();
-
-                    if (user != null) {
-                      Provider.of<AuthNotifier>(context, listen: false).setUser(user);
-
-                      if (user.primeiro_acesso) {
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (
-                                BuildContext context) => const LoginPrimeiroAcessoPage())
-                        );
-                      } else {
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (
-                                BuildContext context) => const HomePage())
-                        );
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ButtonOutline(
+                      text: 'Voltar',
+                      icon: FontAwesomeIcons.chevronLeft,
+                      onPressed: () {
+                        Navigator.pop(context);
                       }
-                    } else {
-                      password.clear();
-                      setState(() {
-                        errorMessage = 'O e-mail ou a senha que você informou está incorreta';
-                      });
-                    }
-                  }
+                  ),
+                  const SizedBox(width: 10,),
+                  ButtonOutline(
+                      icon: FontAwesomeIcons.chevronRight,
+                      iconRight: true,
+                      text: 'Continuar',
+                      onPressed: () async {
+                        showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (_) {
+                              return LoadingDialog(text: 'Procurando o usuário com o email ${ widget.email.value.text }',);
+                            }
+                        );
+
+                        User? user = await service.login(widget.email.value.text, password.value.text);
+
+                        if (!mounted) return;
+
+                        Navigator.of(context).pop();
+
+                        if (user != null) {
+                          Provider.of<AuthNotifier>(context, listen: false).setUser(user);
+
+                          if (user.primeiro_acesso) {
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(builder: (
+                                    BuildContext context) => const LoginPrimeiroAcessoPage())
+                            );
+                          } else {
+                            Navigator.pushReplacement(context,
+                                MaterialPageRoute(builder: (
+                                    BuildContext context) => const HomePage())
+                            );
+                          }
+                        } else {
+                          password.clear();
+                          setState(() {
+                            errorMessage = 'O e-mail ou a senha que você informou está incorreta';
+                          });
+                        }
+                      }
+                  )
+                ],
               )
             ])
     );

@@ -3,7 +3,9 @@
 
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:SisCop/services/image_converter.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:tflite_flutter/tflite_flutter.dart' as tflite;
 import 'package:image/image.dart' as imglib;
@@ -27,7 +29,7 @@ class FaceNetService {
 
   double threshold = 1.0;
 
-  late List? predictedData;
+  List? predictedData;
 
   //  saved users data
   dynamic data = {};
@@ -46,23 +48,35 @@ class FaceNetService {
       p[i+2]=l;
     }
     //salva a imagem localmente
-    return File('$caminho/face.jpg').writeAsBytes(imglib.encodeJpg(imagem));
+    return File('$caminho/face.jpg').writeAsBytes(imagem.getBytes());
   }
 
   Future loadModel() async {
     if (_interpreter == null) {
+      late tflite.Delegate delegate;
+
       try {
-        final gpuDelegateV2 = tflite.GpuDelegateV2(
+        if (Platform.isAndroid) {
+          delegate = tflite.GpuDelegateV2(
             options: tflite.GpuDelegateOptionsV2(
-                isPrecisionLossAllowed: false,
-                inferencePreference: tflite.TfLiteGpuInferenceUsage.fastSingleAnswer,
-                inferencePriority1: tflite.TfLiteGpuInferencePriority.minLatency,
-                inferencePriority2: tflite.TfLiteGpuInferencePriority.auto,
-                inferencePriority3: tflite.TfLiteGpuInferencePriority.auto));
+              isPrecisionLossAllowed: false,
+              inferencePreference: tflite.TfLiteGpuInferenceUsage.fastSingleAnswer,
+              inferencePriority1: tflite.TfLiteGpuInferencePriority.minLatency,
+              inferencePriority2: tflite.TfLiteGpuInferencePriority.auto,
+              inferencePriority3: tflite.TfLiteGpuInferencePriority.auto,
+            ),
+          );
+        } else if (Platform.isIOS) {
+          delegate = tflite.GpuDelegate(
+            options: tflite.GpuDelegateOptions(
+                allowPrecisionLoss: true,
+                waitType: tflite.TFLGpuDelegateWaitType.active),
+          );
+        }
 
         tflite.InterpreterOptions interpreterOptions = tflite
             .InterpreterOptions()
-          ..addDelegate(gpuDelegateV2);
+          ..addDelegate(delegate);
         _interpreter = await tflite.Interpreter.fromAsset(
             'mobilefacenet.tflite',
             options: interpreterOptions);
@@ -88,12 +102,6 @@ class FaceNetService {
 
     predictedData = List.from(output);
   }
-
-  /// pega os dados previstos previamente salvos e faz a inferencia
-  // Future<User> predict() async {
-  //   /// busca o usuário previsto mais próximo, se existir (visinho mais próximo)
-  //   return await _searchResult(this._predictedData);
-  // }
 
   /// _preProess: recorta a imagem para ser mais fácil
   /// para detectar e transformá-lo para o modelo de entrada.
@@ -130,28 +138,7 @@ class FaceNetService {
   /// converte ___CameraImage___ para o tipo ___Image___
   /// [image]: imagem para ser convertida
   imglib.Image _convertCameraImage(CameraImage image) {
-    int width = image.width;
-    int height = image.height;
-    var img = imglib.Image(width, height);
-    const int hexFF = 0xFF000000;
-    final int uvyButtonStride = image.planes[1].bytesPerRow;
-    final int uvPixelStride = image.planes[1].bytesPerPixel!;
-    for (int x = 0; x < width; x++) {
-      for (int y = 0; y < height; y++) {
-        final int uvIndex =
-            uvPixelStride * (x / 2).floor() + uvyButtonStride * (y / 2).floor();
-        final int index = y * width + x;
-        final yp = image.planes[0].bytes[index];
-        final up = image.planes[1].bytes[uvIndex];
-        final vp = image.planes[2].bytes[uvIndex];
-        int r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255);
-        int g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
-            .round()
-            .clamp(0, 255);
-        int b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255);
-        img.data[index] = hexFF | (b << 16) | (g << 8) | r;
-      }
-    }
+    var img = convertToImage(image);
     var img1 = imglib.copyRotate(img, -90);
     return img1;
   }
@@ -176,15 +163,6 @@ class FaceNetService {
     return convertedBytes.buffer.asFloat32List();
   }
 
-  /// busca o resultado no DDBB (esta função deve ser executada em Backend)
-  /// [predictedData]: Array que representa a face pelo modelo MobileFaceNet
-  // Future<User> _searchResult(List predictedData) async {
-  //   Codec<String, String> stringToBase64 = utf8.fuse(base64);
-  //   String tokenPredictedData = stringToBase64.encode(predictedData.join(';'));
-  //
-  //   return await _userService.predict(tokenPredictedData);
-  // }
-  //
   void setPredictedData(value) {
     predictedData = value;
   }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:SisCop/components/common/loading_dialog.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ import 'package:SisCop/components/common/button.dart';
 import 'package:SisCop/services/facenet.service.dart';
 
 import 'dart:math' as math;
+
+import 'package:path_provider/path_provider.dart';
 
 class FaceCamera extends StatefulWidget {
   const FaceCamera({Key? key}) : super(key: key);
@@ -36,11 +39,10 @@ class _FaceCameraState extends State<FaceCamera> {
   late bool pictureTaked = false;
   late bool saving = false;
 
-  late Image sendImage;
-
   late XFile file;
+  Image? image;
 
-  late Future initializeControllerFuture;
+  Future? initializeControllerFuture;
 
   @override
   void initState() {
@@ -48,7 +50,9 @@ class _FaceCameraState extends State<FaceCamera> {
 
     faceDetector = FaceDetector(
       options: FaceDetectorOptions(
-        performanceMode: FaceDetectorMode.accurate
+        performanceMode: FaceDetectorMode.accurate,
+        enableLandmarks: false,
+        minFaceSize: 0.5
       ),
     );
 
@@ -70,11 +74,12 @@ class _FaceCameraState extends State<FaceCamera> {
     controller = CameraController(
       cameraDescription,
       ResolutionPreset.high,
-      enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.yuv420
+      enableAudio: false
     );
 
-    initializeControllerFuture = controller.initialize();
+    setState(() {
+      initializeControllerFuture = controller.initialize();
+    });
 
     await initializeControllerFuture;
 
@@ -86,7 +91,7 @@ class _FaceCameraState extends State<FaceCamera> {
   }
 
   _frameFaces() {
-    imageSize = Size(controller.value.previewSize!.width, controller.value.previewSize!.height);
+    imageSize = Size(controller.value.previewSize!.height, controller.value.previewSize!.width);
 
     controller.startImageStream((image) async {
         print('>>>> startImageStream');
@@ -98,6 +103,8 @@ class _FaceCameraState extends State<FaceCamera> {
 
         try {
           List<Face> faces = await getFacesFromImage(image);
+
+          print('>>> faces ${faces.length}');
 
           if (faces.isNotEmpty) {
             // processa a imagem
@@ -132,6 +139,7 @@ class _FaceCameraState extends State<FaceCamera> {
     setState(() {
       pictureTaked = true;
       this.file = file;
+      image = Image.file(File(file.path));
     });
   }
 
@@ -140,6 +148,7 @@ class _FaceCameraState extends State<FaceCamera> {
     for (final Plane plane in image.planes) {
       allBytes.putUint8List(plane.bytes);
     }
+
     final bytes = allBytes.done().buffer.asUint8List();
 
     final Size imageSize = Size(image.width.toDouble(), image.height.toDouble());
@@ -151,6 +160,8 @@ class _FaceCameraState extends State<FaceCamera> {
     final InputImageFormat inputImageFormat =
         InputImageFormatValue.fromRawValue(image.format.raw) ??
             InputImageFormat.nv21;
+
+    print('>>> imageFormat $inputImageFormat');
 
     final planeData = image.planes.map(
           (Plane plane) {
@@ -170,8 +181,6 @@ class _FaceCameraState extends State<FaceCamera> {
     );
 
     final inputImage = InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
-
-    sendImage = Image.memory(inputImage.bytes!);
 
     return await faceDetector.processImage(inputImage);
   }
@@ -193,22 +202,21 @@ class _FaceCameraState extends State<FaceCamera> {
         ),
       ) : null,
       child:
-        pictureTaked ?
+        pictureTaked && image != null ?
        SizedBox(
         width: width,
         height: height,
-        child: Column(
+        child: Stack(
+          alignment: AlignmentDirectional.bottomStart,
           children: [
-            Image.file(File(file.path)),
+            image!,
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  // width: 300,
-                  // height: 60,
                   child: Button(
                     icon: FontAwesomeIcons.arrowRotateRight,
-                    text: 'Tirar outra',
+                    text: '',
                     onPressed: () {
                       setState(() {
                         cameraInitializated = false;
@@ -222,7 +230,7 @@ class _FaceCameraState extends State<FaceCamera> {
                 Expanded(
                   child: Button(
                     icon: FontAwesomeIcons.check,
-                  text: 'Confirmar',
+                  text: '',
                   onPressed: () {
                     Navigator.of(context).pop(file);
                   }
@@ -234,6 +242,7 @@ class _FaceCameraState extends State<FaceCamera> {
         )
       )
     :
+            initializeControllerFuture != null ?
           FutureBuilder<void>(
             future: initializeControllerFuture,
             builder: (context, snapshot) {
@@ -247,8 +256,8 @@ class _FaceCameraState extends State<FaceCamera> {
                       CameraPreview(controller),
                       faceDetected != null ? CustomPaint(
                         painter: FacePainter(
-                          face: faceDetected!,
-                          imageSize: imageSize
+                            face: faceDetected!,
+                            imageSize: imageSize
                         ),
                       ) : const Text('')
                     ],
@@ -259,6 +268,16 @@ class _FaceCameraState extends State<FaceCamera> {
               return const Center(child: CircularProgressIndicator());
          }
         )
+                :
+        const Center(child: CircularProgressIndicator())
     );
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+
+    await controller.dispose();
+    await faceDetector.close();
   }
 }

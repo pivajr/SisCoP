@@ -1,2 +1,0 @@
-SisCop é um sistema de controle de presença, baseado na geolocalização do usuário e utiliza como base a tecnologia de reconhecimento facial com complemento de autenticação por senha, tornando assim o processo de  marcação/registro de presença mais prático e seguro e pode ser utilizado por pessoas físicas, empresas e instituições de ensino.
-Saiba mais em https://siscop.com.br

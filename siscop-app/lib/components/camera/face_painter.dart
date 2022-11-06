@@ -48,8 +48,8 @@ RRect _scaleRect({
   required Rect rect,
   required Size imageSize,
   required Size widgetSize,
-  required double scaleX,
-  required double scaleY
+  double scaleX = 1,
+  double scaleY = 1
 }) {
   double left = (widgetSize.width - rect.left.toDouble() * scaleX);
   double top = rect.top.toDouble() * scaleY;

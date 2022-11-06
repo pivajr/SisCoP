@@ -1,135 +1,183 @@
+# This file is a template, and might need editing before it works on your project.
+# Official framework image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/php
+image: lorisleiva/laravel-docker:8.1
+
+variables:
+  MYSQL_DATABASE: siscop
+  MYSQL_ROOT_PASSWORD: secret
+  DB_HOST: mysql
+  DB_USERNAME: root
+  DB_DATABASE: siscop
+  APP_ENV: local
+  APP_URL: "http://127.0.0.1:8000"
+  APP_DEBUG: "false"
+  SESSION_DRIVER: database
+  QUEUE_CONNECTION: database
+  MAIL_DRIVER: log
+  DEPLOYER_HOST: siscop.com.br
 
 stages:
-  - test
   - build
+  - test
   - deploy
+  - release
+  - performance
 
-
-code_quality:
-  stage: test
-  image: registry.gitlab.com/pivajr/siscop-app/siscop_flutter
-  before_script:
-    - flutter pub global activate dart_code_metrics
-    - export PATH="$PATH:$HOME/.pub-cache/bin"
-  script:
-    - metrics lib -r codeclimate  > gl-code-quality-report.json
-  artifacts:
-    reports:
-      codequality: gl-code-quality-report.json
-
-test:
-  stage: test
-  image: registry.gitlab.com/pivajr/siscop-app/siscop_flutter
-  before_script:
-    - flutter pub global activate junitreport
-    - export PATH="$PATH:$HOME/.pub-cache/bin"
-    - echo "ENDPOINT_URL=$ENDPOINT_URL" >> .env
-    - echo "SENTRY_DNS=$SENTRY_DNS" >> .env
-  script:
-    - flutter test --machine --coverage | tojunit -o report.xml
-    - lcov --summary coverage/lcov.info
-    - genhtml coverage/lcov.info --output=coverage
-  coverage: '/lines\.*: \d+\.\d+\%/'
-  artifacts:
-    name: coverage
-    paths:
-      - $CI_PROJECT_DIR/coverage
-    reports:
-      junit: report.xml
-
-build_aab:
+composer:
   stage: build
-  image: registry.gitlab.com/pivajr/siscop-app/siscop_flutter
-  before_script:
-    - echo "ENDPOINT_URL=$ENDPOINT_URL" >> .env
-    - echo "SENTRY_DNS=$SENTRY_DNS" >> .env
-    - echo $CI_COMMIT_TAG
-    - echo "/version:/c\version:\ $CI_COMMIT_TAG"
-    - sed -i "/version:/c\version:\ $CI_COMMIT_TAG" pubspec.yaml
-    - cat $KEY_PROPERTIES_CONFIG | base64 -d > android/key.properties
-    - cat $KEY_STORE_UPLOAD | base64 -d > /siscop-upload-keystore.jks
-  script: 
-    - flutter build appbundle
+
+  script:
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress --no-scripts
+    - cp .env.example .env
+    - php artisan key:generate
+
   artifacts:
-    name: appbundle
+    expire_in: 1 month
     paths:
-      - $CI_PROJECT_DIR/build/app/outputs/bundle/release
-      - pubspec.yaml
+      - vendor/
+      - .env
   cache:
-      key: ${CI_COMMIT_REF_SLUG}-appbundle
-      paths:
-        - build/app/outputs/bundle/release
-  needs:
-    - test
-    - code_quality
-  only:
-    - tags
+    key: ${CI_COMMIT_REF_SLUG}-composer
+    paths:
+      - vendor/
 
-deploy_internal:
-  stage: deploy
-  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
-  before_script:
-    - cd android
-    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
-  script:
-    - fastlane internal
-  needs:
-    - build_aab
-  only:
-    - tags
-    
-deploy_beta:
-  stage: deploy
-  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
-  before_script:
-    - cd android
-    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
-  script:
-    - fastlane beta
-  needs:
-    - build_aab
-  only:
-    - tags
-  when: manual
+phpunit:
+  stage: test
 
-deploy_production:
-  stage: deploy
-  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
-  before_script:
-    - cd android
-    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
-  script:
-    - fastlane deploy
-  needs:
-    - build_aab
-  only:
-    - tags
-  when: manual
+  services:
+    - mysql:5.7
 
-promote_internal_to_beta:
-  stage: deploy
-  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
-  before_script:
-    - cd android
-    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
-  script:
-    - fastlane promoteInternalToBeta
   needs:
-    - build_aab
-  only:
-    - tags
-  when: manual
+    - composer
 
-promote_beta_to_production:
-  stage: deploy
-  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
-  before_script:
-    - cd android
-    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
   script:
-    - fastlane promoteBetaToProduction
+    - vendor/bin/phpunit --coverage-text --colors=never
+
+  artifacts:
+    when: on_failure
+    expire_in: 1 week
+    paths:
+      - storage/logs
+
+codestyle:
+  stage: test
+  dependencies: []
+  script:
+    - phpcs --standard=PSR2 --extensions=php app -n --ignore=Database/* -n
+
+phpstan:
+  stage: test
+  dependencies:
+    - composer
+  script:
+    - vendor/bin/phpstan analyse --memory-limit 8G
+
+.init_ssh: &init_ssh |
+  eval $(ssh-agent -s)
+  echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+  [[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+homologacao:
+  stage: deploy
+  image: registry.gitlab.com/siscop/core/siscop-api-laravel/deployer
+  variables:
+    DEPLOYER_AMBIENTE: homologacao
+  script:
+    - *init_ssh
+    - /root/.composer/vendor/bin/dep deploy homologacao -vv --tag="$CI_COMMIT_TAG"
+  environment:
+    name: homologacao
+    url: https://www.homologacao.siscop.com.br
   needs:
-    - build_aab
-  only:
-    - tags
-  when: manual
+    - phpstan
+    - codestyle
+    - phpunit
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\bapi-hom\b/'
+
+release_homologacao:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\bapi-hom\b/'
+  script:
+    - echo 'Executando release $CI_COMMIT_TAG de Homologação'
+  needs:
+    - homologacao
+  environment:
+    name: homologacao
+    url: https://app.homologacao.siscop.com.br
+  release:
+    name: 'Release $CI_COMMIT_TAG'
+    description: 'Release $CI_COMMIT_TAG'
+    tag_name: '$CI_COMMIT_TAG'
+    ref: '$CI_COMMIT_TAG'
+
+performance_homologacao:
+  image:
+    name: loadimpact/k6:latest
+    entrypoint: [ '' ]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\bapi-hom\b/'
+  stage: performance
+  needs:
+    - release_homologacao
+  variables:
+    SISCOP_HOSTNAME: api.homologacao.siscop.com.br
+  script:
+    - echo "executing homologacao k6 in k6 container..."
+    - k6 run ./loadtests/performance-test.js
+
+producao:
+  stage: deploy
+  image: registry.gitlab.com/siscop/core/siscop-api-laravel/deployer
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\bapi-prod\b/'
+  variables:
+    DEPLOYER_AMBIENTE: producao
+  script:
+    - *init_ssh
+    - /root/.composer/vendor/bin/dep deploy producao -vv --tag="$CI_COMMIT_TAG"
+  needs:
+    - phpstan
+    - codestyle
+    - phpunit
+  environment:
+    name: producao
+    url: https://www.siscop.com.br
+
+release_gl_producao:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\bapi-prod\b/'
+  script:
+    - echo 'Executando release $CI_COMMIT_TAG de Produção'
+  needs:
+    - producao
+  release:
+    name: 'Release $CI_COMMIT_TAG'
+    description: 'Release $CI_COMMIT_TAG'
+    tag_name: '$CI_COMMIT_TAG'
+    ref: '$CI_COMMIT_TAG'
+
+release_sentry_producao:
+  stage: release
+  image: registry.gitlab.com/siscop/core/siscop-api-laravel/sentry
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\bapi-prod\b/'
+  variables:
+    VERSION: $CI_COMMIT_TAG
+  script:
+    - echo 'Executando release $CI_COMMIT_TAG de Produção'
+    - sentry-cli releases new -p $STR_PROJECT_NAME $VERSION
+    - sentry-cli releases set-commits --auto $VERSION
+    - sentry-cli releases deploys $VERSION new -e $CI_ENVIRONMENT_NAME
+  needs:
+    - producao
+  environment:
+    name: producao
+    url: https://app.siscop.com.br
