@@ -1,0 +1,23 @@
+<scp-loader [light]="true" [loading]="loading"></scp-loader>
+<scp-row class="my-3">
+  <scp-col>
+    <scp-input-masked label="CEP" inputMask="00.000-000" [showMask]="true" [formControl]="cep" (blur)="findCep()"></scp-input-masked>
+  </scp-col>
+  <scp-col>
+    <scp-input label="UF" [formControl]="uf"></scp-input>
+  </scp-col>
+</scp-row>
+<scp-row class="my-3">
+  <scp-col>
+    <scp-input label="Cidade" [formControl]="cidade"></scp-input>
+  </scp-col>
+  <scp-col>
+    <scp-input label="Bairro" [formControl]="bairro"></scp-input>
+  </scp-col>
+  <scp-col>
+    <scp-input label="Rua" [formControl]="rua"></scp-input>
+  </scp-col>
+  <scp-col>
+    <scp-input label="Nº" [formControl]="numero"></scp-input>
+  </scp-col>
+</scp-row>

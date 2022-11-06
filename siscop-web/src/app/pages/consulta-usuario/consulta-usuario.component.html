@@ -1,0 +1,8 @@
+<scp-tela-consulta title="Consulta de Usuários" [columns]="columns" [service]="userService">
+  <ng-template let-item="item">
+    <td>{{ item.id }}</td>
+    <td>{{ item.name }}</td>
+    <td class="text-center">{{ item.email }}</td>
+    <td class="text-center"><span class="badge" [ngClass]="{'bg-success': item.primeiro_acesso, 'bg-danger': !item.primeiro_acesso}">{{ item.primeiro_acesso ? 'SIM' : 'NÃO' }}</span></td>
+  </ng-template>
+</scp-tela-consulta>

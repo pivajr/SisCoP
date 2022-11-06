@@ -1,0 +1,2 @@
+<input [type]="type" [value]="objValue" [placeholder]="label" [mask]="inputMask" [showMaskTyped]="showMask" [clearIfNotMatch]="clearIfNotMatch" class="form-control" [class]="defClass()" (keyup)="onChangeHandler($event)" (blur)="blur.emit($event)">
+<div class="invalid-feedback" *ngIf="isInvalid()">{{ errorMessage }}</div>

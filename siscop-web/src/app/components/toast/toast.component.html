@@ -1,0 +1,15 @@
+<div #toast class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast-header justify-content-between" [ngClass]="classes"s>
+    <ng-content select="[header]"></ng-content>
+    <span *ngIf="header">
+        {{ header }}
+    </span>
+    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" *ngIf="closeable"></button>
+  </div>
+  <div class="toast-body">
+    <ng-content select="[body]"></ng-content>
+    <span *ngIf="body">
+      {{ body }}
+    </span>
+  </div>
+</div>

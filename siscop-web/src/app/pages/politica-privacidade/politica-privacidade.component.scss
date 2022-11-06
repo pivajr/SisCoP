@@ -1,0 +1,11 @@
+table {
+    $border-table-color: rgb(196, 196, 196);
+    border: 1px solid $border-table-color;
+    border-collapse: collapse;
+    margin-bottom: 1vh;
+
+    thead tr th, tbody tr td {
+        border: 1px solid $border-table-color;
+        padding: 1rem;
+    }
+}

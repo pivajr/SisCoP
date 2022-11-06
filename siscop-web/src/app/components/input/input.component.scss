@@ -1,0 +1,20 @@
+.form-control-light-mode {
+  background: none;
+  border: 1px solid white;
+  color: white;
+  font-weight: lighter;
+  outline: none;
+  box-shadow: none;
+  padding: 1rem;
+  border-radius: 14px;
+
+  &::placeholder {
+    color: rgb(255, 255, 255);
+  }
+}
+
+.form-control:not(.form-control-light-mode) {
+  box-shadow: none;
+  border-radius: 8px;
+  border-bottom-width: 3px;
+}

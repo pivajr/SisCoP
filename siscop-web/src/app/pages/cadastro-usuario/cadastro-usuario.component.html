@@ -1,0 +1,50 @@
+<scp-tela-cadastro #cadastro title="Cadastro de Usuário" [formGroupObj]="userFormGroup" [execCallback]="salvar.bind(this)" (onError)="onErrorHandle($event)">
+    <scp-row class="align-items-start">
+        <scp-col>
+          <div class="btn-group">
+            <button type="button" scpButton typeColor="outline" (click)="addUsuario()"><fa-icon [icon]="faPlus"></fa-icon> Adicionar Usuário</button>
+            <button type="button" scpButton typeColor="outline" color="danger" (click)="clear()"><fa-icon [icon]="faMinus"></fa-icon> Remover Todos</button>
+          </div>
+        </scp-col>
+        <scp-col>
+            <label class="d-block fw-bold">Importar arquivo CSV</label>
+            <input type="file" (change)="handleFileChange($event.target)">
+            <button type="button" scpButton typeColor="outline" (click)="importFromCsv()"><fa-icon [icon]="faUpload"></fa-icon> Importar</button>
+        </scp-col>
+    </scp-row>
+
+    <hr>
+
+    <ng-container *ngFor="let userControl of usuarios.controls; index as i">
+        <scp-row class="clear-padding-mat-form">
+            <scp-col [sizes]="1" class="align-self-center">
+                <button scpButton typeColor="outline" color="danger" (click)="remove(i)"><fa-icon [icon]="faTrash"></fa-icon> Remover</button>
+            </scp-col>
+            <scp-col>
+                <div class="my-3">
+                  <scp-input type="text" label="Nome" [formControl]="getFormControl(userControl, 'nome')"></scp-input>
+                </div>
+            </scp-col>
+            <scp-col>
+                <div class="my-3">
+                  <scp-input type="text" label="E-mail*" [formControl]="getFormControl(userControl, 'email')"></scp-input>
+                </div>
+            </scp-col>
+            <scp-col>
+                <div class="my-3">
+                  <scp-input type="text" label="RA" [formControl]="getFormControl(userControl, 'ra')"></scp-input>
+                </div>
+            </scp-col>
+            <scp-col>
+                <div class="my-3">
+                  <scp-input type="text" inputMask="000.000.000-00" label="CPF/CNPJ" [formControl]="getFormControl(userControl, 'cpfCnpj')"></scp-input>
+                </div>
+            </scp-col>
+            <scp-col>
+              <div class="my-3">
+                <scp-input type="text" label="Código da Turma" [formControl]="getFormControl(userControl, 'codigo_turma')"></scp-input>
+              </div>
+            </scp-col>
+        </scp-row>
+    </ng-container>
+</scp-tela-cadastro>

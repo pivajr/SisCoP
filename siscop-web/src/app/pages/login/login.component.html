@@ -1,0 +1,26 @@
+<div class="container-fluid container-full">
+  <scp-loader [light]="true" [loading]="loading"></scp-loader>
+  <scp-row>
+      <scp-col [sizes]="6" [offsets]="3">
+          <div class="logo">
+              <img src="assets/logo2_white.png" alt="Logo SisCop" class="img-fluid"/>
+          </div>
+          <form (submit)="entrar()" [formGroup]="frmLogin!" id="frmLogin" name="frmLogin">
+              <scp-row [cols]="1" [gy]="1">
+                  <scp-col>
+                      <div class="mb-3">
+                        <scp-input type="email" label="E-mail" [formControl]="email" [lightMode]="true"></scp-input>
+                      </div>
+                  </scp-col>
+                  <scp-col>
+                      <div class="mb-3">
+                        <scp-input type="password" label="Senha" [formControl]="password" [lightMode]="true"></scp-input>
+                      </div>
+                  </scp-col>
+              </scp-row>
+
+              <button type="submit" class="btn btn-lg btn-outline-light" [disabled]="loading" (click)="entrar()"><fa-icon prefix="fas" [icon]="iconLoginButton"></fa-icon> Entrar</button>
+          </form>
+      </scp-col>
+  </scp-row>
+</div>

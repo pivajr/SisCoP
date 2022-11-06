@@ -1,0 +1,43 @@
+/* You can add global styles to this file, and also import other style files */
+
+$primary: rgb(0, 172, 255);
+$danger: rgb(241, 83, 98);
+$success: rgb(105, 209, 40);
+
+:root {
+  --bs-primary: rgb(0, 172, 255);
+}
+
+@import "~bootstrap/scss/bootstrap";
+
+@each $color, $value in $theme-colors {
+  .btn-outline-#{$color} {
+    &:hover {
+      color: rgb(255, 255, 255);
+    }
+  }
+}
+
+*, *:after, *:before {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.clear-padding-mat-form {
+  .mat-form-field-wrapper {
+    padding-bottom: 0 !important;
+  }
+}
+
+.fit {
+  height: 100vh;
+}
+

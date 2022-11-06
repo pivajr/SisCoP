@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "944542096454",
+    "project_id": "siscop-d7e05",
+    "storage_bucket": "siscop-d7e05.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:944542096454:android:7f3f85ac8904eb0a557e47",
+        "android_client_info": {
+          "package_name": "br.com.siscop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "944542096454-fhqs3979o7q95b2pcrqjmdst0n6qg7l5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6snp2kSNr28IfN_0ARVUii4ucLqWW904"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "944542096454-fhqs3979o7q95b2pcrqjmdst0n6qg7l5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

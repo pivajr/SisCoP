@@ -1,0 +1,143 @@
+.loader-overlay {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  z-index: 999;
+
+  &:before {
+    content: '';
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    background: rgba(00,00,00,0.5);
+  }
+}
+
+/**
+  * Building blocks
+  *
+  * @author jh3y - jheytompkins.com
+*/
+$size: 20px;
+$color: var(--bs-white);
+$no-of-el: 7;
+$delay: .15s;
+$reset: translate(-50%, -50%);
+
+@keyframes building-blocks {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translateY(-300%);
+  }
+  30%,
+  70% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  90%,
+  100% {
+    opacity: 0;
+    transform: translateY(300%);
+  }
+}
+
+.building-blocks {
+  &:not(.light) {
+    div {
+      &:nth-child(1) {
+        &:after {
+          background: rgb(174, 61, 205);
+        }
+      }
+
+      &:nth-child(2) {
+        &:after {
+          background: rgb(133, 96, 244);
+        }
+      }
+
+      &:nth-child(3) {
+        &:after {
+          background: rgb(106, 141, 248);
+        }
+      }
+
+      &:nth-child(4) {
+        &:after {
+          background: rgb(157, 145, 227);
+        }
+      }
+
+      &:nth-child(5) {
+        &:after {
+          background: rgb(22, 178, 250);
+        }
+      }
+
+      &:nth-child(6) {
+        &:after {
+          background: rgb(133, 96, 244);
+        }
+      }
+
+      &:nth-child(7) {
+        &:after {
+          background: rgb(157, 145, 227);
+        }
+      }
+    }
+  }
+}
+
+.building-blocks {
+  position: relative;
+  div {
+    height: $size;
+    position: absolute;
+    width: $size;
+
+    &:after {
+      animation: building-blocks (($no-of-el * 2) * $delay) ease infinite backwards;
+      background: $color;
+      content: '';
+      display: block;
+      height: $size;
+      width: $size;
+    }
+
+    &:nth-child(1) {
+      transform: $reset translate(60%, 120%);
+    }
+    &:nth-child(2) {
+      transform: $reset translate(-60%, 120%);
+    }
+    &:nth-child(3) {
+      transform: $reset translate(120%, 0);
+    }
+    &:nth-child(4) {
+      transform: $reset;
+    }
+    &:nth-child(5) {
+      transform: $reset translate(-120%, 0);
+    }
+    &:nth-child(6) {
+      transform: $reset translate(60%, -120%);
+    }
+    &:nth-child(7) {
+      transform: $reset translate(-60%, -120%);
+    }
+
+  }
+  @for $el from 1 through $no-of-el {
+    div:nth-child(#{$el}):after {
+      animation-delay: $el * $delay;
+    }
+  }
+}

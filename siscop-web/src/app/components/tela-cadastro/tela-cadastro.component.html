@@ -1,0 +1,12 @@
+<scp-loader [light]="true" [loading]="loading"></scp-loader>
+<scp-tela-base [title]="title">
+  <form class="mt-3 mb-3 needs-validation" [formGroup]="formGroupObj" (submit)="submit()">
+    <ng-content></ng-content>
+
+    <button type="submit" scpButton typeColor="outline" color="success"><fa-icon [icon]="btnSaveIcon"></fa-icon> Confirmar</button>
+  </form>
+
+  <div class="toast-container position-absolute top-0 end-0">
+    <scp-toast #toast [header]="alertMessage?.title!" [body]="alertMessage?.message!" [color]="alertMessage?.type!" [textColor]="alertMessage?.textColor!"></scp-toast>
+  </div>
+</scp-tela-base>

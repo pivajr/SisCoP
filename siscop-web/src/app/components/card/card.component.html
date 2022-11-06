@@ -1,0 +1,11 @@
+<div class="card" [ngClass]="getClasses()">
+  <div class="card-body">
+    <div class="card-title fw-lighter title">
+      <ng-content select="[title]"></ng-content>
+      <span *ngIf="title">
+        {{ title }}
+      </span>
+    </div>
+    <ng-content></ng-content>
+  </div>
+</div>

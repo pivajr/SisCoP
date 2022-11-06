@@ -1,0 +1,39 @@
+<scp-tela-cadastro #cadastro title="Cadastro de Empresa" [formGroupObj]="formGroup" [execCallback]="salvar.bind(this)" (onError)="onErrorHandle($event)">
+      <scp-card title="Informações da empresa">
+        <scp-row class="my-3">
+          <scp-col [sizes]="cpfCnpjControlSize">
+            <scp-input-masked inputMask="000.000.000-00||00.000.000/0000-00" [showMask]="true" label="CNPJ/CPF" [formControl]="getControl('cpf_cnpj')"></scp-input-masked>
+          </scp-col>
+          <scp-col>
+            <scp-input label="Nome da Empresa" [formControl]="getControl('nome')"></scp-input>
+          </scp-col>
+        </scp-row>
+      </scp-card>
+      <scp-card title="Outras informações">
+        <scp-row class="my-3">
+          <scp-col>
+            <scp-input label="Atividade" [formControl]="getControl('atividade')"></scp-input>
+          </scp-col>
+          <scp-col>
+            <scp-input label="Nome Responsável" [formControl]="getControl('nome_responsavel')"></scp-input>
+          </scp-col>
+        </scp-row>
+        <scp-row class="my-3">
+          <scp-col>
+            <scp-input label="E-mail Responsável" [formControl]="getControl('email_responsavel')"></scp-input>
+          </scp-col>
+          <scp-col>
+            <scp-input type="number" label="Quantidade de Funcionários" [formControl]="getControl('qtd_funcionarios')"></scp-input>
+          </scp-col>
+        </scp-row>
+      </scp-card>
+      <scp-card title="Endereço">
+        <button scpButton typeColor="outline" color="primary" (click)="addEndereco()">Adicionar Endereço</button>
+
+        <ng-container *ngFor="let enderecoControl of enderecos.controls; index as i">
+          <scp-endereco-fields [group]="castFormGroup(enderecoControl)"></scp-endereco-fields>
+          <button scpButton typeColor="outline" color="danger" (click)="remove(i)">Remover</button>
+          <hr/>
+        </ng-container>
+      </scp-card>
+</scp-tela-cadastro>

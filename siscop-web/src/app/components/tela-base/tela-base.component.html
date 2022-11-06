@@ -1,0 +1,33 @@
+<div class="content d-flex flex-column justify-content-between">
+  <scp-header></scp-header>
+  <div class="container-fluid">
+    <scp-row class="my-3">
+      <scp-col [sizes]="3">
+        <aside class="sidebar">
+          <ul class="menu">
+            <li>
+              <span class="menu-title">Cadastros</span>
+              <ul>
+                <li><a routerLink="/cadastro-usuario">Usuário</a></li>
+                <li><a routerLink="/cadastro-instituicao">Empresa</a></li>
+                <li><a routerLink="/turma/cadastro">Turma</a></li>
+              </ul>
+            </li>
+            <li>
+              <span class="menu-title">Consultas</span>
+              <ul>
+                <li><a routerLink="/consulta-usuario">Usuário</a></li>
+              </ul>
+            </li>
+          </ul>
+        </aside>
+      </scp-col>
+        <scp-col [sizes]="9">
+          <scp-card [title]="title">
+            <ng-content></ng-content>
+          </scp-card>
+        </scp-col>
+    </scp-row>
+  </div>
+  <scp-footer></scp-footer>
+</div>

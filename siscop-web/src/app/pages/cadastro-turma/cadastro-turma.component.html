@@ -1,0 +1,29 @@
+<scp-tela-cadastro #cadastro title="Cadastro de Turma" [formGroupObj]="formGroup" [execCallback]="salvar.bind(this)" (onError)="onErrorHandle($event)">
+    <scp-row class="clear-padding-mat-form">
+      <scp-col>
+        <div class="my-3">
+          <scp-input type="text" label="Código da Turma" [formControl]="codigo_turma"></scp-input>
+        </div>
+      </scp-col>
+      <scp-col>
+        <div class="my-3">
+          <scp-input type="text" label="Responsável" [formControl]="user_email"></scp-input>
+        </div>
+      </scp-col>
+      <scp-col>
+        <div class="my-3">
+          <scp-input type="text" label="Curso" [formControl]="curso"></scp-input>
+        </div>
+      </scp-col>
+      <scp-col>
+        <div class="my-3">
+          <scp-input type="text" label="Semestre" [formControl]="semestre"></scp-input>
+        </div>
+      </scp-col>
+      <scp-col>
+        <div class="my-3">
+          <scp-input type="text" label="disciplina" [formControl]="disciplina"></scp-input>
+        </div>
+      </scp-col>
+    </scp-row>
+</scp-tela-cadastro>

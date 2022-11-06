@@ -1,0 +1,135 @@
+
+stages:
+  - test
+  - build
+  - deploy
+
+
+code_quality:
+  stage: test
+  image: registry.gitlab.com/pivajr/siscop-app/siscop_flutter
+  before_script:
+    - flutter pub global activate dart_code_metrics
+    - export PATH="$PATH:$HOME/.pub-cache/bin"
+  script:
+    - metrics lib -r codeclimate  > gl-code-quality-report.json
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+
+test:
+  stage: test
+  image: registry.gitlab.com/pivajr/siscop-app/siscop_flutter
+  before_script:
+    - flutter pub global activate junitreport
+    - export PATH="$PATH:$HOME/.pub-cache/bin"
+    - echo "ENDPOINT_URL=$ENDPOINT_URL" >> .env
+    - echo "SENTRY_DNS=$SENTRY_DNS" >> .env
+  script:
+    - flutter test --machine --coverage | tojunit -o report.xml
+    - lcov --summary coverage/lcov.info
+    - genhtml coverage/lcov.info --output=coverage
+  coverage: '/lines\.*: \d+\.\d+\%/'
+  artifacts:
+    name: coverage
+    paths:
+      - $CI_PROJECT_DIR/coverage
+    reports:
+      junit: report.xml
+
+build_aab:
+  stage: build
+  image: registry.gitlab.com/pivajr/siscop-app/siscop_flutter
+  before_script:
+    - echo "ENDPOINT_URL=$ENDPOINT_URL" >> .env
+    - echo "SENTRY_DNS=$SENTRY_DNS" >> .env
+    - echo $CI_COMMIT_TAG
+    - echo "/version:/c\version:\ $CI_COMMIT_TAG"
+    - sed -i "/version:/c\version:\ $CI_COMMIT_TAG" pubspec.yaml
+    - cat $KEY_PROPERTIES_CONFIG | base64 -d > android/key.properties
+    - cat $KEY_STORE_UPLOAD | base64 -d > /siscop-upload-keystore.jks
+  script: 
+    - flutter build appbundle
+  artifacts:
+    name: appbundle
+    paths:
+      - $CI_PROJECT_DIR/build/app/outputs/bundle/release
+      - pubspec.yaml
+  cache:
+      key: ${CI_COMMIT_REF_SLUG}-appbundle
+      paths:
+        - build/app/outputs/bundle/release
+  needs:
+    - test
+    - code_quality
+  only:
+    - tags
+
+deploy_internal:
+  stage: deploy
+  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
+  before_script:
+    - cd android
+    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
+  script:
+    - fastlane internal
+  needs:
+    - build_aab
+  only:
+    - tags
+    
+deploy_beta:
+  stage: deploy
+  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
+  before_script:
+    - cd android
+    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
+  script:
+    - fastlane beta
+  needs:
+    - build_aab
+  only:
+    - tags
+  when: manual
+
+deploy_production:
+  stage: deploy
+  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
+  before_script:
+    - cd android
+    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
+  script:
+    - fastlane deploy
+  needs:
+    - build_aab
+  only:
+    - tags
+  when: manual
+
+promote_internal_to_beta:
+  stage: deploy
+  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
+  before_script:
+    - cd android
+    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
+  script:
+    - fastlane promoteInternalToBeta
+  needs:
+    - build_aab
+  only:
+    - tags
+  when: manual
+
+promote_beta_to_production:
+  stage: deploy
+  image: registry.gitlab.com/pivajr/siscop-app/siscop_fastlane
+  before_script:
+    - cd android
+    - cat $GOOGLE_PLAY_AUTH | base64 -d > /json_key_file.json
+  script:
+    - fastlane promoteBetaToProduction
+  needs:
+    - build_aab
+  only:
+    - tags
+  when: manual

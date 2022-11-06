@@ -1,0 +1,32 @@
+<scp-tela-base [title]="title">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <td *ngFor="let column of columns" [ngClass]="{'text-center': column.center}">{{ getFieldName(column.text) }}</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of datasource">
+        <ng-template *ngTemplateOutlet="templateRef; context: {item: data}"></ng-template>
+      </tr>
+      <tr *ngIf="!loading && !datasource.length">
+        <td class="text-center" [attr.colspan]="columns.length">{{ emptyMessage }}</td>
+      </tr>
+      <tr *ngIf="loading">
+        <td class="text-center" [attr.colspan]="columns.length">{{ loadingMessage }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <nav aria-label="Page navigation" *ngIf="datasource.length && resp.meta.last_page !== 1">
+    <ul class="pagination">
+      <li class="page-item" *ngIf="resp.meta.current_page !== 1"><a class="page-link" (click)="loadPage(resp.meta.current_page - 1)">Anterior</a></li>
+      <li class="page-item" *ngIf="resp.meta.current_page !== 1"><a class="page-link" (click)="loadPage(1)">1</a></li>
+      <li class="page-item" [ngClass]="{active: resp.meta.current_page === i}" *ngFor="let i of getPagesRange()"><a class="page-link" (click)="loadPage(i)">{{ i }}</a></li>
+      <li class="page-item" [ngClass]="{active: resp.meta.current_page === resp.meta.last_page}" *ngIf="resp.meta.last_page !== 1"><a class="page-link" (click)="loadPage(resp.meta.last_page)">{{ resp.meta.last_page }}</a></li>
+      <li class="page-item" *ngIf="resp.meta.current_page !== resp.meta.last_page"><a class="page-link" (click)="loadPage(resp.meta.current_page + 1)">Próximo</a></li>
+    </ul>
+  </nav>
+</scp-tela-base>
+
+<scp-loader [light]="true" [loading]="loading"></scp-loader>
