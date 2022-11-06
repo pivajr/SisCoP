@@ -17,17 +17,18 @@
 
   Desenvolvido para as duas principais plataformas (Android e iOS). Trata-se do aplicativo móvel que permite o registro da presença em ambas as plataformas (celulares ou tablets) 
 
-  - Android
-![android](https://www.siscop.com.br/imagens/splash.png)
+  - Android e iOS
+![app](https://www.siscop.com.br/imagens/app.png)
+  
+  O Aplicativo utiliza um modelo de Rede Neural MobileFaceNet
 
-  - iOS
-![ios](https://www.siscop.com.br/imagens/splash.png)
+![processo](https://www.siscop.com.br/imagens/processo.png)
 
 #  SisCoP-WEB
 
  Sistema para gerenciamento de informações das instituições e pessoas cadastradas. Apenas podem registrar ou fazer o registro pessoas ou instituições previamente cadastrada.
 
-![web](https://www.siscop.com.br/imagens/splash.png)
+![web](https://www.siscop.com.br/imagens/web.png)
 
 #  SisCoP-API
 
@@ -42,9 +43,10 @@
 
  Siga as orientações presentes no arquivo install.pdf localizado na raiz do presente repositório.
 
+<br><br>
 
 ### Software Registrado <br>
-Software devidamente registrado junto ao INPI sob número: <br>
+Software devidamente registrado junto ao INPI sob número: BR 51 2022 002733-0.<br>
 
 <br><br>
 
