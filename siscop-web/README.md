@@ -1,27 +1,19 @@
-# Siscop
+# SisCop WEB
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.0.2.
+A aplicação Web do SisCop é responsável pela parte administrativa da plataforma, onde o usuário administrador realiza a gestão e manutenção dos dados e acessos, como também tem acesso a relatórios sobre as turmas
 
-## Development server
+## Pré-requisitos
+- NodeJS
+- Yarn
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Execução
+A aplicação WEB foi desenvolvida em cima do framework Angular 2+, para executar a aplicação execute os seguintes comandos:
 
-## Code scaffolding
+1. Execute o comando `yarn install` para instalar e configurar todas as bibliotecas necessárias
+2. Altere o arquivo **environment.ts** com a url base da API para poder conectar
+3. Após a instalação execute o comando `ng serve` para subir local
+4. Pronto, aplicação WEB iniciada 🚀🚀
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Documentação auxíliar
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Toda a aplicação foi desenvolvida no framework [Angular](https://angular.io/docs), recomendo fortemente a leitura da documentação, onde eles tem uma documentação rica em exemplos e muito bem explicada desde o básico até o avançado
