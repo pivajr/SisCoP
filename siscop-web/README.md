@@ -5,6 +5,7 @@ A aplicação Web do SisCop é responsável pela parte administrativa da platafo
 ## Pré-requisitos
 - NodeJS
 - Yarn
+- Angular CLI
 
 ## Execução
 A aplicação WEB foi desenvolvida em cima do framework Angular 2+, para executar a aplicação execute os seguintes comandos:
